@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Discovery Question Bank — Qualify.fyi</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --teal: #0D7377; --teal-mid: #0A5E62; --teal-light: #C8EAEB; --teal-pale: #EAF6F6; --teal-glow: rgba(13,115,119,0.12);
+      --slate: #1E293B; --slate-mid: #334155; --slate-light: #64748B; --slate-pale: #F1F5F9; --slate-border: #E2E8F0; --slate-border2: #CBD5E1;
+      --green: #059669; --green-pale: #ECFDF5; --red: #DC2626; --red-pale: #FEF2F2;
+      --amber: #D97706; --amber-pale: #FFFBEB; --blue: #2563EB; --blue-pale: #EFF6FF; --violet: #7C3AED; --violet-pale: #F5F3FF;
+      --white: #FFFFFF; --bg: #F8FAFC;
+      --shadow-xs: 0 1px 2px rgba(0,0,0,0.05); --shadow-sm: 0 1px 4px rgba(0,0,0,0.07),0 1px 2px rgba(0,0,0,0.04); --shadow-md: 0 4px 16px rgba(0,0,0,0.08),0 1px 4px rgba(0,0,0,0.04);
+      --radius: 8px; --radius-lg: 12px;
+    }
+    body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); color: var(--slate); min-height: 100vh; font-size: 14px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+
+    /* Nav */
+    .nav { background: var(--white); border-bottom: 1px solid var(--slate-border); height: 52px; display: flex; align-items: center; justify-content: space-between; padding: 0 28px; position: sticky; top: 0; z-index: 20; box-shadow: var(--shadow-xs); }
+    .nav-left { display: flex; align-items: center; gap: 16px; }
+    .nav-logo { display: flex; align-items: center; gap: 8px; text-decoration: none; }
+    .logo-mark { height: 28px; padding: 0 12px; background: var(--teal); border-radius: 7px; display: inline-flex; align-items: center; justify-content: center; color: white; font-size: 13px; font-weight: 700; flex-shrink: 0; letter-spacing: -0.3px; white-space: nowrap; }
+    .nav-divider { width: 1px; height: 20px; background: var(--slate-border); }
+    .nav-breadcrumb { font-size: 13px; color: var(--slate-light); display: flex; align-items: center; gap: 6px; }
+    .nav-breadcrumb span { color: var(--slate-border2); }
+    .nav-breadcrumb strong { color: var(--slate-mid); font-weight: 600; }
+    .nav-right { display: flex; align-items: center; gap: 8px; }
+    .nav-btn { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 13px; font-weight: 600; padding: 6px 13px; border-radius: var(--radius); border: 1px solid var(--slate-border2); background: var(--white); color: var(--slate-mid); cursor: pointer; transition: all 0.12s; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; }
+    .nav-btn:hover { border-color: var(--slate-light); color: var(--slate); background: var(--slate-pale); }
+    .nav-btn.key-btn { border-color: transparent; background: var(--teal-pale); color: var(--teal-mid); }
+    .nav-btn.key-btn:hover { background: var(--teal-light); }
+    .nav-btn.key-btn.no-key { background: var(--red-pale); color: var(--red); }
+    .key-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); flex-shrink: 0; }
+    .key-dot.off { background: var(--red); }
+
+    /* API drawer */
+    .api-drawer { background: var(--white); border-bottom: 1px solid var(--slate-border); padding: 14px 28px; display: none; }
+    .api-drawer.visible { display: block; }
+    .api-drawer-inner { max-width: 700px; display: flex; align-items: center; gap: 20px; }
+    .api-drawer-text { flex: 1; }
+    .api-drawer-title { font-size: 13px; font-weight: 700; color: var(--slate); margin-bottom: 2px; }
+    .api-drawer-desc { font-size: 12px; color: var(--slate-light); }
+    .api-drawer-desc a { color: var(--teal); text-decoration: none; }
+    .api-drawer-desc a:hover { text-decoration: underline; }
+    .api-form { display: flex; gap: 8px; flex-shrink: 0; }
+    .api-input { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 13px; padding: 7px 12px; border: 1px solid var(--slate-border2); border-radius: var(--radius); background: var(--bg); color: var(--slate); outline: none; width: 280px; transition: border-color 0.15s, box-shadow 0.15s; }
+    .api-input:focus { border-color: var(--teal); box-shadow: 0 0 0 3px var(--teal-glow); }
+    .api-save { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 13px; font-weight: 600; padding: 7px 16px; border: none; border-radius: var(--radius); background: var(--teal); color: #fff; cursor: pointer; white-space: nowrap; }
+    .api-save:hover { background: var(--teal-mid); }
+
+    /* Layout */
+    .page { display: grid; grid-template-columns: 320px 1fr; gap: 24px; max-width: 1080px; margin: 0 auto; padding: 28px 24px 60px; }
+    .form-col { display: flex; flex-direction: column; gap: 12px; }
+    .card { background: var(--white); border: 1px solid var(--slate-border); border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-sm); }
+    .card-header { padding: 12px 16px; border-bottom: 1px solid var(--slate-border); display: flex; align-items: center; justify-content: space-between; }
+    .card-title { font-size: 11px; font-weight: 700; color: var(--slate-light); letter-spacing: 0.06em; text-transform: uppercase; }
+    .card-body { padding: 14px 16px; display: flex; flex-direction: column; gap: 12px; }
+    .field { display: flex; flex-direction: column; gap: 4px; }
+    .field-label { font-size: 11px; font-weight: 700; color: var(--slate-light); letter-spacing: 0.04em; text-transform: uppercase; }
+    input[type="text"], select, textarea { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 13px; padding: 7px 10px; border: 1px solid var(--slate-border2); border-radius: var(--radius); background: var(--white); color: var(--slate); width: 100%; outline: none; transition: border-color 0.15s, box-shadow 0.15s; -webkit-appearance: none; }
+    input[type="text"]:focus, select:focus, textarea:focus { border-color: var(--teal); box-shadow: 0 0 0 3px var(--teal-glow); }
+    select { cursor: pointer; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='7' viewBox='0 0 10 7'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%2364748B' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; padding-right: 28px; }
+    textarea { resize: vertical; min-height: 68px; line-height: 1.5; }
+    .pill-group { display: flex; flex-wrap: wrap; gap: 5px; }
+    .pill { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 999px; border: 1px solid var(--slate-border2); background: var(--white); color: var(--slate-light); cursor: pointer; transition: all 0.12s; user-select: none; }
+    .pill:hover { border-color: var(--teal); color: var(--teal); background: var(--teal-pale); }
+    .pill.active { background: var(--teal-pale); border-color: var(--teal); color: var(--teal); }
+
+    /* Buttons */
+    .gen-btn { width: 100%; padding: 11px; background: var(--teal); color: #fff; border: none; border-radius: var(--radius); font-family: 'Plus Jakarta Sans', sans-serif; font-size: 14px; font-weight: 700; cursor: pointer; transition: background 0.15s, transform 0.1s; box-shadow: 0 2px 8px rgba(13,115,119,0.22); }
+    .gen-btn:hover { background: var(--teal-mid); }
+    .gen-btn:active { transform: scale(0.998); }
+    .gen-btn:disabled { background: var(--slate-border2); color: var(--slate-light); cursor: not-allowed; box-shadow: none; }
+    .clear-btn { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: var(--radius); border: 1px solid var(--slate-border2); background: transparent; color: var(--slate-light); cursor: pointer; transition: all 0.12s; }
+    .clear-btn:hover { border-color: var(--red); color: var(--red); background: var(--red-pale); }
+    .error-box { display: none; padding: 9px 13px; background: var(--red-pale); color: var(--red); border-radius: var(--radius); font-size: 12px; font-weight: 600; border-left: 3px solid var(--red); margin-top: 8px; }
+    .error-box.on { display: block; }
+
+    /* Results col */
+    .results-col { min-width: 0; }
+    .empty-state { background: var(--white); border: 1px solid var(--slate-border); border-radius: var(--radius-lg); padding: 52px 32px; text-align: center; box-shadow: var(--shadow-sm); }
+    .empty-icon { width: 48px; height: 48px; background: var(--teal-pale); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; font-size: 22px; }
+    .empty-title { font-size: 16px; font-weight: 700; color: var(--slate); margin-bottom: 6px; }
+    .empty-desc { font-size: 13px; color: var(--slate-light); max-width: 260px; margin: 0 auto; line-height: 1.6; }
+    .loading-box { display: none; background: var(--white); border: 1px solid var(--slate-border); border-radius: var(--radius-lg); padding: 48px 32px; text-align: center; box-shadow: var(--shadow-sm); }
+    .loading-box.on { display: block; }
+    .spinner { width: 32px; height: 32px; border: 3px solid var(--teal-light); border-top-color: var(--teal); border-radius: 50%; animation: spin 0.75s linear infinite; margin: 0 auto 14px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loading-title { font-size: 14px; font-weight: 700; color: var(--slate); margin-bottom: 4px; }
+    .loading-desc { font-size: 12px; color: var(--slate-light); }
+
+    /* Results area */
+    .results-area { display: none; }
+    .results-area.on { display: block; }
+    .results-topbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; flex-wrap: wrap; gap: 8px; }
+    .results-heading { display: flex; align-items: baseline; gap: 8px; }
+    .results-title { font-size: 15px; font-weight: 700; color: var(--slate); }
+    .results-count { font-size: 12px; color: var(--slate-light); }
+    .action-btns { display: flex; gap: 6px; }
+    .action-btn { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 12px; font-weight: 600; padding: 6px 13px; border: 1px solid var(--slate-border2); border-radius: var(--radius); background: var(--white); color: var(--slate-light); cursor: pointer; transition: all 0.12s; display: inline-flex; align-items: center; gap: 5px; }
+    .action-btn:hover { border-color: var(--slate-light); color: var(--slate); }
+    .action-btn.primary { background: var(--teal-pale); border-color: var(--teal-light); color: var(--teal-mid); }
+    .action-btn.primary:hover { background: var(--teal-light); border-color: var(--teal); }
+
+    /* Dimension sections */
+    .dim-section { margin-bottom: 20px; }
+    .dim-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+    .dim-tag { font-size: 10px; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; padding: 3px 9px; border-radius: 4px; }
+    .dim-tag.technical   { background: var(--blue-pale);   color: var(--blue); }
+    .dim-tag.business    { background: var(--green-pale);  color: var(--green); }
+    .dim-tag.champion    { background: var(--violet-pale); color: var(--violet); }
+    .dim-tag.commercial  { background: var(--amber-pale);  color: var(--amber); }
+    .dim-tag.competitive { background: var(--red-pale);    color: var(--red); }
+    .dim-line { flex: 1; height: 1px; background: var(--slate-border); }
+
+    /* Question cards */
+    .q-card { background: var(--white); border: 1px solid var(--slate-border); border-left: 3px solid var(--teal-light); border-radius: var(--radius-lg); padding: 15px 17px; margin-bottom: 8px; transition: border-left-color 0.15s, box-shadow 0.15s; }
+    .q-card:hover { border-left-color: var(--teal); box-shadow: var(--shadow-md); }
+    .q-card-top { display: flex; align-items: flex-start; gap: 11px; margin-bottom: 11px; }
+    .q-num { font-size: 10px; font-weight: 700; color: var(--teal); background: var(--teal-pale); border: 1px solid var(--teal-light); border-radius: 5px; padding: 3px 8px; white-space: nowrap; margin-top: 2px; flex-shrink: 0; }
+    .q-text { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 15px; font-weight: 500; color: var(--slate); line-height: 1.5; }
+    .q-signals { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-left: 42px; }
+    .signal { padding: 9px 11px; border-radius: var(--radius); font-size: 12px; line-height: 1.5; }
+    .signal.good { background: var(--green-pale); border-left: 2px solid var(--green); color: #064E3B; }
+    .signal.bad  { background: var(--red-pale);   border-left: 2px solid var(--red);   color: #7F1D1D; }
+    .sig-label { font-size: 9px; font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase; margin-bottom: 3px; }
+    .signal.good .sig-label { color: var(--green); }
+    .signal.bad  .sig-label { color: var(--red); }
+
+    /* Footer */
+    /* Research toggle */
+    .research-toggle { display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: var(--teal-pale); border: 1px solid var(--teal-light); border-radius: var(--radius); cursor: pointer; user-select: none; transition: all 0.12s; }
+    .research-toggle:hover { background: var(--teal-light); border-color: var(--teal); }
+    .research-toggle.off { background: var(--slate-pale); border-color: var(--slate-border2); }
+    .research-toggle.off:hover { border-color: var(--slate-light); }
+    .toggle-switch { width: 32px; height: 18px; border-radius: 999px; background: var(--slate-border2); position: relative; flex-shrink: 0; transition: background 0.2s; }
+    .toggle-switch.on { background: var(--teal); }
+    .toggle-knob { width: 14px; height: 14px; border-radius: 50%; background: white; position: absolute; top: 2px; left: 2px; transition: left 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
+    .toggle-switch.on .toggle-knob { left: 16px; }
+    .toggle-label { font-size: 12px; font-weight: 600; color: var(--teal-mid); flex: 1; }
+    .research-toggle.off .toggle-label { color: var(--slate-light); }
+    .toggle-badge { font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 4px; background: var(--teal); color: white; letter-spacing: 0.04em; }
+    .research-toggle.off .toggle-badge { display: none; }
+    .researching-msg { font-size: 11px; color: var(--teal-mid); margin-top: 6px; display: none; font-style: italic; }
+    .page-footer { max-width: 1080px; margin: 0 auto; padding: 20px 24px 40px; display: flex; justify-content: space-between; border-top: 1px solid var(--slate-border); }
+    .page-footer p { font-size: 12px; color: var(--slate-light); }
+    .page-footer a { color: var(--slate-light); text-decoration: none; }
+    .page-footer a:hover { color: var(--teal); }
+
+    /* Print styles */
+    @media print {
+      .nav, .api-drawer, .form-col, .page-footer, .action-btns, .results-topbar .action-btns { display: none !important; }
+      body { background: white; font-size: 12px; }
+      .page { display: block; padding: 0; max-width: 100%; }
+      .results-col { display: block; }
+      .results-area { display: block !important; }
+      .print-header { display: block !important; }
+      .q-card { break-inside: avoid; border: 1px solid #e2e8f0; border-left: 3px solid #0D7377; box-shadow: none; margin-bottom: 10px; }
+      .q-signals { grid-template-columns: 1fr 1fr; }
+      .signal { border: 1px solid #e2e8f0; }
+      .results-topbar { margin-bottom: 16px; }
+    }
+
+    .print-header { display: none; margin-bottom: 20px; padding-bottom: 14px; border-bottom: 2px solid var(--teal); }
+    .print-header h1 { font-size: 18px; font-weight: 700; color: var(--slate); margin-bottom: 4px; }
+    .print-header p { font-size: 12px; color: var(--slate-light); }
+
+    @media (max-width: 740px) {
+      /* Layout */
+      .page { grid-template-columns: 1fr; padding: 14px 14px 80px; gap: 16px; }
+      .results-col { min-width: 0; }
+
+      /* Nav */
+      .nav { padding: 0 16px; height: 48px; }
+      .nav-right { gap: 6px; }
+      .nav-btn { font-size: 12px; padding: 5px 10px; }
+
+      /* API drawer */
+      .api-drawer { padding: 12px 16px; }
+      .api-drawer-inner { flex-direction: column; gap: 10px; }
+      .api-form { width: 100%; }
+      .api-input { flex: 1; width: auto; min-width: 0; }
+
+      /* Form description */
+      .form-col > div:first-child { margin-bottom: 10px; }
+
+      /* Cards */
+      .card-body { padding: 12px 14px; gap: 10px; }
+      .card-header { padding: 10px 14px; }
+
+      /* Pills — make them easier to tap */
+      .pill { font-size: 13px; padding: 6px 13px; }
+      .pill-group { gap: 6px; }
+
+      /* Generate button — sticky at bottom on mobile */
+      .gen-btn { 
+        position: fixed; bottom: 0; left: 0; right: 0;
+        border-radius: 0;
+        padding: 16px;
+        font-size: 15px;
+        z-index: 30;
+        box-shadow: 0 -4px 16px rgba(0,0,0,0.1);
+      }
+      .gen-btn:disabled { position: relative; border-radius: var(--radius); box-shadow: none; }
+      .error-box { margin-bottom: 80px; }
+
+      /* Questions */
+      .q-signals { grid-template-columns: 1fr; margin-left: 0; gap: 6px; }
+      .q-card { padding: 13px 14px; }
+      .q-card-top { gap: 9px; }
+      .q-text { font-size: 14px; }
+      .signal { padding: 8px 10px; }
+
+      /* Results topbar */
+      .results-topbar { flex-direction: column; align-items: flex-start; gap: 10px; }
+      .action-btns { width: 100%; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; }
+      .action-btn { justify-content: center; font-size: 11px; padding: 7px 8px; }
+
+      /* Empty/loading states */
+      .empty-state { padding: 36px 20px; }
+      .loading-box { padding: 36px 20px; }
+
+      /* Footer */
+      .page-footer { padding: 16px 14px 24px; flex-direction: column; gap: 4px; align-items: flex-start; }
+
+      /* Research toggle */
+      .research-toggle { padding: 10px 12px; }
+    }
+
+    @media (max-width: 380px) {
+      .action-btns { grid-template-columns: 1fr 1fr; }
+      .action-btn:last-child { grid-column: 1 / -1; }
+    }
+
+    /* Info tooltip */
+    .info-btn { width: 28px; height: 28px; border-radius: 50%; border: 1px solid var(--slate-border2); background: var(--white); color: var(--slate-light); font-size: 13px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.12s; position: relative; font-family: Georgia, serif; }
+    .info-btn:hover { border-color: var(--teal); color: var(--teal); background: var(--teal-pale); }
+
+    .info-modal-overlay { display: none; position: fixed; inset: 0; background: rgba(15,23,42,0.4); z-index: 100; align-items: center; justify-content: center; padding: 20px; }
+    .info-modal-overlay.visible { display: flex; }
+    .info-modal { background: var(--white); border-radius: var(--radius-lg); max-width: 460px; width: 100%; box-shadow: 0 20px 60px rgba(0,0,0,0.15); overflow: hidden; }
+    .info-modal-header { padding: 18px 20px 0; display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+    .info-modal-title { font-size: 15px; font-weight: 700; color: var(--slate); }
+    .info-modal-close { width: 28px; height: 28px; border-radius: 6px; border: none; background: var(--slate-pale); color: var(--slate-light); font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.12s; line-height: 1; }
+    .info-modal-close:hover { background: var(--slate-border2); color: var(--slate); }
+    .info-modal-body { padding: 16px 20px 20px; display: flex; flex-direction: column; gap: 14px; }
+    .info-step { display: flex; gap: 12px; align-items: flex-start; }
+    .info-step-num { width: 22px; height: 22px; border-radius: 50%; background: var(--teal); color: white; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
+    .info-step-text { font-size: 13px; color: var(--slate-mid); line-height: 1.55; }
+    .info-step-text strong { color: var(--slate); font-weight: 600; }
+    .info-step-text a { color: var(--teal); text-decoration: none; }
+    .info-step-text a:hover { text-decoration: underline; }
+    .info-warning { background: var(--amber-pale); border: 1px solid #FDE68A; border-radius: var(--radius); padding: 11px 13px; font-size: 12px; color: #78350F; line-height: 1.55; }
+    .info-warning strong { font-weight: 700; }
+    .info-divider { border: none; border-top: 1px solid var(--slate-border); margin: 0; }
+  </style>
+</head>
+<body>
+  <nav class="nav">
+    <div class="nav-left">
+      <a class="nav-logo" href="https://khurramparacha.me" target="_blank">
+        <div class="logo-mark">Qualify.fyi</div>
+      </a>
+
+    </div>
+    <div class="nav-right">
+      <button class="nav-btn key-btn no-key" id="key-btn" onclick="toggleDrawer()">
+        <span class="key-dot off" id="key-dot"></span>
+        <span id="key-label">Connect API key</span>
+      </button>
+      <button class="info-btn" onclick="toggleInfo()" title="How to get an API key">?</button>
+    </div>
+  </nav>
+
+  <div class="api-drawer" id="api-drawer">
+    <div class="api-drawer-inner">
+      <div class="api-drawer-text">
+        <div class="api-drawer-title">Your Anthropic API key</div>
+        <div class="api-drawer-desc">Get yours at <a href="https://console.anthropic.com/keys" target="_blank">console.anthropic.com/keys</a>. Stored in your browser only — never sent anywhere except Anthropic directly. Each generation costs ~$0.003.</div>
+      </div>
+      <div class="api-form">
+        <input class="api-input" type="password" id="api-key-input" placeholder="sk-ant-..." />
+        <button class="api-save" onclick="saveKey()">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="page">
+    <div class="form-col">
+      <div style="margin-bottom: 4px;">
+        <div style="font-size: 15px; font-weight: 700; color: var(--slate); margin-bottom: 5px; letter-spacing: -0.2px;">Discovery Question Bank</div>
+        <div style="font-size: 12px; color: var(--slate-light); line-height: 1.6;">Fill in your deal context, pick a qualification framework, and get 10 tailored questions to run before your next call. Each question includes a guide on what a strong vs. weak answer looks like. Enable prospect research to pull live web intel on your account first.</div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Deal record</span>
+          <button class="clear-btn" onclick="clearForm()">Clear</button>
+        </div>
+        <div class="card-body">
+          <div class="field">
+            <div class="field-label">Product / solution</div>
+            <input type="text" id="product" />
+          </div>
+          <div class="field">
+            <div class="field-label">Prospect company <span style="font-weight:400;text-transform:none;letter-spacing:0;font-size:11px">(optional)</span></div>
+            <input type="text" id="company" placeholder="e.g. Acme Corp" />
+          </div>
+          <div class="field">
+            <div class="field-label">Buyer role</div>
+            <select id="role">
+              <option value="">Select role...</option>
+              <option>Economic buyer (CFO, CEO, COO, VP Finance)</option>
+              <option>Technical buyer (CTO, VP Engineering, Head of IT, Solutions Architect)</option>
+              <option>Business sponsor (VP Sales, VP Marketing, Head of Product, COO)</option>
+              <option>Operations (Director of Ops, RevOps, BizOps, IT Manager)</option>
+              <option>End user / practitioner (Analyst, Manager, Team Lead)</option>
+              <option>Legal / Compliance (General Counsel, DPO, Compliance Officer)</option>
+              <option>Procurement / Vendor Management</option>
+            </select>
+          </div>
+          <div class="field">
+            <div class="field-label">Deal stage</div>
+            <select id="stage">
+              <option value="">Select stage...</option>
+              <option>Early discovery — cold / inbound</option>
+              <option>Active evaluation — comparing vendors</option>
+              <option>Late stage — pre-close / technical validation</option>
+            </select>
+          </div>
+          <div class="field">
+            <div class="field-label">Company type</div>
+            <div class="pill-group" id="ind-pills">
+              <div class="pill" data-val="Enterprise (1000+ employees)">Enterprise</div>
+              <div class="pill" data-val="Mid-Market (100–1000 employees)">Mid-Market</div>
+              <div class="pill" data-val="SMB (under 100 employees)">SMB</div>
+              <div class="pill" data-val="Startup (high-growth, early stage)">Startup</div>
+              <div class="pill" data-val="Public company">Public co.</div>
+              <div class="pill" data-val="Non-profit or Government">Non-profit / Gov</div>
+            </div>
+          </div>
+          <div class="field">
+            <div class="field-label">Prospect context <span style="font-weight:400;text-transform:none;letter-spacing:0;font-size:11px">(optional)</span></div>
+            <textarea id="context"></textarea>
+          </div>
+          <div class="field">
+            <div class="field-label">Prospect research <span style="font-weight:400;text-transform:none;letter-spacing:0;font-size:11px">(uses web search)</span></div>
+            <div class="research-toggle off" id="research-toggle" onclick="toggleResearch()">
+              <div class="toggle-switch" id="toggle-switch"><div class="toggle-knob"></div></div>
+              <span class="toggle-label" id="toggle-label">Off — generate from context only</span>
+              <span class="toggle-badge">LIVE</span>
+            </div>
+            <div class="researching-msg" id="researching-msg">🔍 Searching the web for prospect intel...</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header"><span class="card-title">Framework</span></div>
+        <div class="card-body">
+          <div class="pill-group" id="fw-pills">
+            <div class="pill active" data-val="MEDDIC">MEDDIC</div>
+            <div class="pill" data-val="SPIN">SPIN</div>
+            <div class="pill" data-val="BANT">BANT</div>
+            <div class="pill" data-val="No framework">No framework</div>
+          </div>
+        </div>
+      </div>
+
+      <button class="gen-btn" id="gen-btn" onclick="generate()">Generate question bank</button>
+      <div class="error-box" id="err"></div>
+    </div>
+
+    <div class="results-col">
+      <div class="empty-state" id="empty">
+        <div class="empty-icon">🎯</div>
+        <div class="empty-title">No questions yet</div>
+        <div class="empty-desc">Fill in your deal context and hit generate to build a tailored question bank.</div>
+      </div>
+      <div class="loading-box" id="loading">
+        <div class="spinner"></div>
+        <div class="loading-title" id="loading-title">Building your question bank</div>
+        <div class="loading-desc" id="loading-desc">Generating 10 questions across 5 qualification dimensions...</div>
+      </div>
+      <div class="results-area" id="results">
+        <div class="results-topbar">
+          <div class="results-heading">
+            <span class="results-title">Question bank</span>
+            <span class="results-count" id="r-meta"></span>
+          </div>
+          <div class="action-btns">
+            <button class="action-btn" onclick="generate(true)">↺ Regenerate</button>
+            <button class="action-btn" onclick="copyAll()">Copy all</button>
+            <button class="action-btn primary" onclick="exportPDF()">↓ Export PDF</button>
+          </div>
+        </div>
+        <div class="print-header" id="print-header">
+          <h1>Discovery Question Bank</h1>
+          <p id="print-meta"></p>
+        </div>
+        <div id="q-output"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-footer">
+    <p>Built by Khurram Paracha · Qualify.fyi</p>
+  </div>
+
+  <!-- Info modal -->
+  <div class="info-modal-overlay" id="info-modal" onclick="closeInfoOnOverlay(event)">
+    <div class="info-modal">
+      <div class="info-modal-header">
+        <div class="info-modal-title">How to connect your API key</div>
+        <button class="info-modal-close" onclick="toggleInfo()">&#x2715;</button>
+      </div>
+      <div class="info-modal-body">
+        <div class="info-step">
+          <div class="info-step-num">1</div>
+          <div class="info-step-text">Go to <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a> and sign in or create a free account.</div>
+        </div>
+        <div class="info-step">
+          <div class="info-step-num">2</div>
+          <div class="info-step-text">Navigate to <strong>Settings → API Keys</strong> and click <strong>Create Key</strong>. Copy it immediately — Anthropic only shows it once.</div>
+        </div>
+        <div class="info-step">
+          <div class="info-step-num">3</div>
+          <div class="info-step-text">Go to <strong>Settings → Billing</strong> and add a payment method. Load at least <strong>$5 in credits</strong> — the API won't work without a credit balance.</div>
+        </div>
+        <div class="info-step">
+          <div class="info-step-num">4</div>
+          <div class="info-step-text">Click <strong>Connect API key</strong> in the top right, paste your key, and hit Save. You're ready to generate.</div>
+        </div>
+        <hr class="info-divider" />
+        <div class="info-warning">
+          <strong>⚠ A few things to know:</strong> A standard generation costs roughly <strong>$0.03</strong> (~3 cents). With prospect research enabled it jumps to around <strong>$0.45</strong> (~45 cents) due to web search. A $5 credit balance covers ~165 standard generations or ~11 with research. Credits won't auto-renew unless you enable it. Your API key is stored only in your browser — never sent anywhere except Anthropic directly.
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+  let apiKey = localStorage.getItem('anthropic_api_key') || '';
+  let industry = '';
+  let framework = 'MEDDIC';
+  let lastQuestions = null;
+
+  // Restore saved state
+  const saved = localStorage.getItem('qualify_last_session');
+  if (saved) {
+    try {
+      const s = JSON.parse(saved);
+      if (s.product) document.getElementById('product').value = s.product;
+      if (s.company) document.getElementById('company').value = s.company;
+      if (s.role) document.getElementById('role').value = s.role;
+      if (s.stage) document.getElementById('stage').value = s.stage;
+      if (s.context) document.getElementById('context').value = s.context;
+      if (s.industry) {
+        industry = s.industry;
+        document.querySelectorAll('#ind-pills .pill').forEach(p => {
+          if (p.dataset.val === s.industry) p.classList.add('active');
+        });
+      }
+      if (s.framework) {
+        framework = s.framework;
+        document.querySelectorAll('#fw-pills .pill').forEach(p => {
+          if (p.dataset.val === s.framework) { p.classList.remove('active'); }
+          if (p.dataset.val === s.framework) p.classList.add('active');
+        });
+      }
+      if (s.questions) {
+        lastQuestions = s.questions;
+        render(s.questions, true);
+      }
+    } catch(e) {}
+  }
+
+  function saveSession() {
+    const s = {
+      product: document.getElementById('product').value,
+      company: document.getElementById('company').value,
+      role: document.getElementById('role').value,
+      stage: document.getElementById('stage').value,
+      context: document.getElementById('context').value,
+      industry, framework,
+      questions: lastQuestions
+    };
+    localStorage.setItem('qualify_last_session', JSON.stringify(s));
+  }
+
+  function toggleInfo() {
+    document.getElementById('info-modal').classList.toggle('visible');
+  }
+
+  function closeInfoOnOverlay(e) {
+    if (e.target === document.getElementById('info-modal')) toggleInfo();
+  }
+
+  function updateKeyUI() {
+    const dot = document.getElementById('key-dot');
+    const lbl = document.getElementById('key-label');
+    const btn = document.getElementById('key-btn');
+    if (apiKey) { dot.classList.remove('off'); lbl.textContent = 'API key connected'; btn.classList.remove('no-key'); }
+    else { dot.classList.add('off'); lbl.textContent = 'Connect API key'; btn.classList.add('no-key'); }
+  }
+
+  function toggleDrawer() {
+    const d = document.getElementById('api-drawer');
+    d.classList.toggle('visible');
+    if (d.classList.contains('visible') && apiKey) document.getElementById('api-key-input').value = apiKey;
+  }
+
+  function saveKey() {
+    const v = document.getElementById('api-key-input').value.trim();
+    if (!v.startsWith('sk-ant-')) { alert('Invalid key format — should start with sk-ant-'); return; }
+    apiKey = v;
+    localStorage.setItem('anthropic_api_key', apiKey);
+    updateKeyUI();
+    document.getElementById('api-drawer').classList.remove('visible');
+  }
+
+  function clearForm() {
+    document.getElementById('product').value = '';
+    document.getElementById('company').value = '';
+    document.getElementById('role').value = '';
+    document.getElementById('stage').value = '';
+    document.getElementById('context').value = '';
+    document.querySelectorAll('#ind-pills .pill').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('#fw-pills .pill').forEach(p => p.classList.remove('active'));
+    document.querySelector('#fw-pills .pill[data-val="MEDDIC"]').classList.add('active');
+    industry = '';
+    framework = 'MEDDIC';
+    clearErr();
+    document.getElementById('results').classList.remove('on');
+    document.getElementById('empty').style.display = 'block';
+    lastQuestions = null;
+    localStorage.removeItem('qualify_last_session');
+  }
+
+  document.querySelectorAll('#ind-pills .pill').forEach(p => {
+    p.addEventListener('click', () => {
+      document.querySelectorAll('#ind-pills .pill').forEach(x => x.classList.remove('active'));
+      p.classList.add('active');
+      industry = p.dataset.val;
+    });
+  });
+
+  document.querySelectorAll('#fw-pills .pill').forEach(p => {
+    p.addEventListener('click', () => {
+      document.querySelectorAll('#fw-pills .pill').forEach(x => x.classList.remove('active'));
+      p.classList.add('active'); framework = p.dataset.val;
+    });
+  });
+
+  function err(msg) { const e = document.getElementById('err'); e.textContent = msg; e.classList.add('on'); }
+  function clearErr() { document.getElementById('err').classList.remove('on'); }
+
+  let researchEnabled = false;
+
+  function toggleResearch() {
+    researchEnabled = !researchEnabled;
+    const toggle = document.getElementById('research-toggle');
+    const sw = document.getElementById('toggle-switch');
+    const lbl = document.getElementById('toggle-label');
+    if (researchEnabled) {
+      toggle.classList.remove('off');
+      sw.classList.add('on');
+      lbl.textContent = 'On — search web for prospect intel';
+    } else {
+      toggle.classList.add('off');
+      sw.classList.remove('on');
+      lbl.textContent = 'Off — generate from context only';
+    }
+  }
+
+  async function generate(regen = false) {
+    const product = document.getElementById('product').value.trim();
+    const company = document.getElementById('company').value.trim();
+    const role = document.getElementById('role').value;
+    const stage = document.getElementById('stage').value;
+    const context = document.getElementById('context').value.trim();
+    const btn = document.getElementById('gen-btn');
+
+    clearErr();
+    if (!apiKey) { err('No API key connected. Click "Connect API key" in the top right.'); return; }
+    if (!product || !role || !stage) { err('Please fill in product, buyer role, and deal stage.'); return; }
+
+    btn.disabled = true;
+    document.getElementById('empty').style.display = 'none';
+    document.getElementById('results').classList.remove('on');
+    document.getElementById('loading').classList.add('on');
+
+    const useSearch = researchEnabled && context.length > 2;
+
+    if (useSearch) {
+      document.getElementById('loading-title').textContent = 'Researching your prospect...';
+      document.getElementById('loading-desc').textContent = 'Searching the web for intel before generating questions. This takes ~15 seconds.';
+    } else {
+      document.getElementById('loading-title').textContent = 'Building your question bank';
+      document.getElementById('loading-desc').textContent = 'Generating 10 questions across 5 qualification dimensions...';
+    }
+
+    const prompt = useSearch
+      ? `You are an expert Sales Engineer and pre-sales coach with access to web search.
+
+Deal context:
+- Product: ${product}
+- Prospect company: ${company || 'not specified'}
+- Buyer role: ${role}
+- Deal stage: ${stage}
+- Company type: ${industry || 'not specified'}
+- Framework: ${framework}
+- Prospect / company info: ${context}
+
+STEP 1: Use web search to research the prospect company mentioned in the context above. Look for:
+- Recent news, funding rounds, layoffs, leadership changes, earnings
+- Their current tech stack (job postings, G2, LinkedIn)
+- Industry pressures or regulatory changes relevant to them
+- Any signals about their current priorities or challenges
+
+STEP 2: Using your research AND the deal context, generate exactly 10 sharp discovery/qualification questions across 5 dimensions (2 per dimension):
+1. Technical fit
+2. Business pain & impact
+3. Champion & stakeholder access
+4. Commercial readiness
+5. Competitive landscape
+
+Make questions specific to what you found in your research — reference real signals where relevant.
+
+Return ONLY a valid JSON array of 10 objects each with:
+- "question": sharp, specific, informed by research where possible
+- "dimension": exactly one of the 5 names above
+- "good_answer": strong answer signal (1-2 sentences)
+- "red_flag": weak/disqualifying signal (1-2 sentences)
+
+ONLY the JSON array. No markdown. Start with [ end with ].`
+      : `You are an expert Sales Engineer and pre-sales coach.
+
+Deal context:
+- Product: ${product}
+- Prospect company: ${company || 'not specified'}
+- Buyer role: ${role}
+- Deal stage: ${stage}
+- Company type: ${industry || 'not specified'}
+- Framework: ${framework}
+- Prospect context: ${context || 'none'}
+
+Generate exactly 10 sharp, specific discovery/qualification questions across 5 dimensions (2 per dimension):
+1. Technical fit
+2. Business pain & impact
+3. Champion & stakeholder access
+4. Commercial readiness
+5. Competitive landscape
+
+Return a JSON array of 10 objects each with:
+- "question": specific to this context, never generic
+- "dimension": exactly one of the 5 names above
+- "good_answer": strong answer signal (1-2 sentences)
+- "red_flag": weak/disqualifying signal (1-2 sentences)
+
+ONLY the JSON array. No markdown. Start with [ end with ].`;
+
+    try {
+      const body = {
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 4000,
+        messages: [{ role: 'user', content: prompt }]
+      };
+
+      if (useSearch) {
+        body.tools = [{ type: 'web_search_20250305', name: 'web_search' }];
+      }
+
+      // Agentic loop to handle web search tool use
+      let messages = [{ role: 'user', content: prompt }];
+      let finalText = '';
+      let iterations = 0;
+      const maxIter = 8;
+
+      while (iterations < maxIter) {
+        iterations++;
+        const resp = await fetch('https://api.anthropic.com/v1/messages', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
+          body: JSON.stringify({ ...body, messages })
+        });
+        const data = await resp.json();
+        if (!resp.ok) throw new Error(data.error?.message || `API error ${resp.status}`);
+
+        // Add assistant response to messages
+        messages.push({ role: 'assistant', content: data.content });
+
+        if (data.stop_reason === 'end_turn') {
+          // Extract final text
+          finalText = data.content.filter(b => b.type === 'text').map(b => b.text).join('');
+          break;
+        }
+
+        if (data.stop_reason === 'tool_use') {
+          // Update loading message to show search in progress
+          const searchCount = data.content.filter(b => b.type === 'tool_use').length;
+          document.getElementById('loading-desc').textContent = `Running ${searchCount} web search${searchCount > 1 ? 'es' : ''}... building your question bank next.`;
+
+          // Build tool results — for web_search_20250305 Anthropic handles execution server-side
+          // We send back the tool_use_id with the content from the tool result block if present
+          const toolResults = data.content
+            .filter(b => b.type === 'tool_use')
+            .map(b => {
+              // Find matching tool_result in content if Anthropic included it
+              const resultBlock = data.content.find(rb => rb.type === 'tool_result' && rb.tool_use_id === b.id);
+              return {
+                type: 'tool_result',
+                tool_use_id: b.id,
+                content: resultBlock ? resultBlock.content : 'Search completed.'
+              };
+            });
+          messages.push({ role: 'user', content: toolResults });
+        } else {
+          // Unexpected stop reason — extract whatever text we have
+          finalText = data.content.filter(b => b.type === 'text').map(b => b.text).join('');
+          break;
+        }
+      }
+
+      if (!finalText) throw new Error('No response generated. Please try again.');
+
+      const raw = finalText.trim().replace(/^```json\s*/i,'').replace(/```$/,'').trim();
+      const questions = JSON.parse(raw);
+      lastQuestions = questions;
+      saveSession();
+      render(questions, false, useSearch);
+
+    } catch(e) {
+      document.getElementById('empty').style.display = 'block';
+      err(e instanceof SyntaxError ? 'Unexpected response format — please try again.' : 'Error: ' + (e.message || 'Something went wrong.'));
+    }
+
+    btn.disabled = false;
+    document.getElementById('loading').classList.remove('on');
+  }
+
+  function render(qs, fromCache = false, researchUsed = false) {
+    const product = document.getElementById('product').value.trim();
+    const role = document.getElementById('role').value;
+    const stage = document.getElementById('stage').value;
+
+    const dims = ['Technical fit','Business pain & impact','Champion & stakeholder access','Commercial readiness','Competitive landscape'];
+    const cls = { 'Technical fit':'technical','Business pain & impact':'business','Champion & stakeholder access':'champion','Commercial readiness':'commercial','Competitive landscape':'competitive' };
+    const grp = {}; dims.forEach(d => grp[d] = []);
+    qs.forEach(q => {
+      const k = dims.find(d => d.toLowerCase() === (q.dimension||'').toLowerCase()) || dims.find(d => d.toLowerCase().startsWith((q.dimension||'').toLowerCase().split(' ')[0])) || dims[0];
+      grp[k].push(q);
+    });
+    let html = ''; let i = 1;
+    dims.forEach(d => {
+      if (!grp[d]?.length) return;
+      html += `<div class="dim-section"><div class="dim-row"><span class="dim-tag ${cls[d]}">${d}</span><div class="dim-line"></div></div>`;
+      grp[d].forEach(q => {
+        html += `<div class="q-card"><div class="q-card-top"><span class="q-num">Q${i++}</span><p class="q-text">${esc(q.question)}</p></div><div class="q-signals"><div class="signal good"><div class="sig-label">Strong answer</div>${esc(q.good_answer)}</div><div class="signal bad"><div class="sig-label">Red flag</div>${esc(q.red_flag)}</div></div></div>`;
+      });
+      html += '</div>';
+    });
+
+    // Update print header meta
+    const parts = [company, product, role, stage, industry].filter(Boolean);
+    document.getElementById('print-meta').textContent = `Generated by Qualify.fyi · ${parts.join(' · ')} · ${new Date().toLocaleDateString()}`;
+
+    document.getElementById('q-output').innerHTML = html;
+    const researchBadge = researchUsed ? ' · 🔍 web research' : '';
+    const cacheBadge = fromCache ? ' · restored' : '';
+    document.getElementById('r-meta').textContent = `${qs.length} questions · 5 dimensions${researchBadge}${cacheBadge}`;
+    document.getElementById('empty').style.display = 'none';
+    document.getElementById('results').classList.add('on');
+    if (!fromCache) document.getElementById('results').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function esc(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+  function copyAll() {
+    const product = document.getElementById('product').value.trim();
+    const role = document.getElementById('role').value;
+    const stage = document.getElementById('stage').value;
+    let t = 'DISCOVERY QUESTION BANK — Qualify.fyi\n' + '='.repeat(44) + '\n';
+    if (product) t += `Product: ${product} · Role: ${role} · Stage: ${stage}\n`;
+    t += '\n';
+    document.querySelectorAll('.dim-section').forEach(sec => {
+      const d = sec.querySelector('.dim-tag')?.textContent || '';
+      t += `${d.toUpperCase()}\n${'-'.repeat(d.length)}\n`;
+      sec.querySelectorAll('.q-card').forEach(c => {
+        t += `\n${c.querySelector('.q-num')?.textContent}: ${c.querySelector('.q-text')?.textContent?.trim()}\n`;
+        t += `  ✓ ${c.querySelector('.signal.good')?.textContent?.replace('Strong answer','')?.trim()}\n`;
+        t += `  ✗ ${c.querySelector('.signal.bad')?.textContent?.replace('Red flag','')?.trim()}\n`;
+      });
+      t += '\n';
+    });
+    navigator.clipboard.writeText(t.trim()).then(() => {
+      const btns = document.querySelectorAll('.action-btn');
+      const copyBtn = Array.from(btns).find(b => b.textContent.includes('Copy'));
+      if (copyBtn) { const o = copyBtn.textContent; copyBtn.textContent = 'Copied!'; setTimeout(() => copyBtn.textContent = o, 2000); }
+    });
+  }
+
+  function exportPDF() {
+    document.getElementById('print-header').style.display = 'block';
+    window.print();
+    setTimeout(() => { document.getElementById('print-header').style.display = 'none'; }, 500);
+  }
+
+  updateKeyUI();
+</script>
+</body>
+</html>
